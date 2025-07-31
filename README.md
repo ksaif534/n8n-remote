@@ -62,6 +62,16 @@ A flexible client contact form with conditional routing of information based on 
   - Gmail → Telegram
 - Conditional workflow execution based on user selection
 
+### API Scraper To Notion Database
+
+A workflow that fetches data from an external API and stores it in a Notion database.
+
+**Features:**
+- HTTP request to fetch data from external APIs
+- Data transformation and formatting
+- Automatic Notion database page creation
+- Structured data storage in Notion
+
 ## Getting Started
 
 ### Prerequisites

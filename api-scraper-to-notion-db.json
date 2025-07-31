@@ -1,0 +1,165 @@
+{
+  "name": "API Scraper To Notion Database",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "76b1c3b0-fcde-473b-91b5-43a761f8849a",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://jsonplaceholder.typicode.com/posts",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 20
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "081ec62b-9543-4228-bc85-6be5abc49381",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aa5f0345-fb63-4d9a-9ec5-fc3f8a7049ea",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "940ae4ad-f3bb-49e1-adfc-fe04f408384f",
+              "name": "body",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "e91ce01a-aa85-4b4d-b1d4-d6551fa07a15",
+      "name": "Format Posts"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "2416a750-9297-80ae-a31d-f0f436e78319",
+          "mode": "list",
+          "cachedResultName": "SKDatabase",
+          "cachedResultUrl": "https://www.notion.so/2416a750929780aea31df0f436e78319"
+        },
+        "title": "={{ $('HTTP Request').item.json.userId.toString() }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Title|rich_text",
+              "textContent": "={{ $json.title }}"
+            },
+            {
+              "key": "Content|rich_text",
+              "richText": true,
+              "text": {
+                "text": [
+                  {
+                    "text": "={{ $json.body }}",
+                    "annotationUi": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "1c319e2b-7720-49e9-b0bb-9640ed529cfd",
+      "name": "Send To Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "7RndUJfM7cbzzPro",
+          "name": "Notion account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Format Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Posts": {
+      "main": [
+        [
+          {
+            "node": "Send To Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7b7bb514-b8c2-419b-b347-be40ba975284",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b3c16ec41e85b3584be131b5515c638ca3963efad6f1c753d483ef391689444"
+  },
+  "id": "g92y1mTrBUKLKna2",
+  "tags": []
+}
