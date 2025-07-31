@@ -1,0 +1,153 @@
+{
+  "name": "Patient Appointment Scheduler",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -160,
+        -112
+      ],
+      "id": "d3839342-cdd3-47ea-a079-95e24f49c16b",
+      "name": "When chat message received",
+      "webhookId": "baea4aa6-cb4c-4c3d-969a-e96fab1dd209"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "=# Role\nYou are a scheduling assistant for a medical chamber. Your role is to help patients schedule an appointment in the doctor's calendar.\n\n# Instructions\nFollow the following steps to book an appointment for the patient:\n\n1. Ask the patient for their preferred apointment day.\n\n2. Use the check_calendar_availability tool to identify free time slots for the patient-specified day.\n\n3. Show the patients avialable time slots for their preferred day & get from the patient time slot they would like to book an appointment for. If there are no time slots available for the day, start from step 1 again & ask the patient for a new day preference. However, if there are time slots available for the day, proceed to step 4.\n\n4. Ask the patient the information that you require to book the calendar appointment. You need the patient's full name & email.\n\n5. Use the create_calendar_appointment tool to book the appointment for the patient, using details captured from step 4.\n\n6. Once the appointment is booked, notify the patient with relevant details about the appointment. Notify the patient if it is not possible to create the appointment.\n\n# Rules\n- Always use UTC+6 timezone when using tools or their outputs.\n\n- Don't make things up. Ask the patient a clarifying question if you need additional information to complete your task\n\n# Examples\nUse the following examples to notify the patient that you've successfully booked their appointment:\n\n<examples>\n<example>\nI have successfully booked your appointment. Here are the details:\n\n**Date & Time**: 15:30 on Tuesday,29 July,2025\n**Email for booking**: john@doe.com\nIf you need to cancel your appointment,please call +8801718432571\n</example>\n\n<example>\nI have successfully booked your appointment. Here are the details:\n\n**Date & Time**: 9.45 on Wednesday,6 August,2025\n**Email for booking**: kawkab@gmail.com\nIf you need to cancel your appointment,please call +8801718432571\n</example>\n</examples>\n\n# Additional Context\n- The date & time right now is {{ $now }}\n- The medical chamber is called 'SK Clinic'\n- The medical chamber's phone number is +8801718432571"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        304,
+        -16
+      ],
+      "id": "a5f0bfd5-1345-4408-96dc-82fe6a6a9247",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        144,
+        208
+      ],
+      "id": "caec7a3f-2ebd-4ebf-84cf-878be629e489",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "CMPqewcXnUlHdSij",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Use this check_calendar_availability tool to fetch existing appointments or events for a specified period & determine whether there are available time slots that can accomodate a new appointment or event.\n\n# Instructions\n1. Specify the Date & Range - to fetch events for a specific day, set eventsAfter to 8.59 & eventsBefore to 18.01 of the same day(adjust these times if needed)\n\n2. Retrieve Existing Appointments - The tool will return all booked appointments or events within the specified date & time range.\n\n3. Calculate Available Slots - Once you have the existing appointments or events, calculate the gaps between them to find potential availability. Ensure each gap is at least as long as the required appointment length. Do not allow any overlap between existing appointments or events.\n\nBy following these steps, you can accurately find valid appointment windows based on the already booked events.",
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "59f7f19b0ed2344b80bfb2653b4912cff152bcdb1d6a5e2274e9ffd55152bfb2@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Test n8n Calendar"
+        },
+        "timeMin": "={{ $fromAI('eventsAfter','Returns events after this date time, use 2025-07-22T00:00:00') }}",
+        "timeMax": "={{ $fromAI('eventsBefore','Returns events before this date time, use 2025-07-22T00:00:00') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        464,
+        192
+      ],
+      "id": "0439affd-1d4c-4ad0-8f20-fbdd29b0f6e6",
+      "name": "check_calendar_availability",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "DeqoClo5egTrWle5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "573eb3af-b2b1-4223-8a50-42f1b66b3393",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        112
+      ],
+      "id": "fceb46af-dfba-4df8-b597-d584da94d782",
+      "name": "Webhook",
+      "webhookId": "573eb3af-b2b1-4223-8a50-42f1b66b3393"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check_calendar_availability": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3fe59ff0-a31d-4995-9232-392faa5e9c83",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b3c16ec41e85b3584be131b5515c638ca3963efad6f1c753d483ef391689444"
+  },
+  "id": "uGfpjc0ZxmoFaCjk",
+  "tags": []
+}

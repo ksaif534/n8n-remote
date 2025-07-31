@@ -1,0 +1,155 @@
+{
+  "name": "Form Submission Flow",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Request Submission For Installation",
+        "formDescription": "Fill out this form to request an Installation.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Email Address",
+              "fieldType": "email",
+              "placeholder": "Email Address",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Preferred Installation Date",
+              "fieldType": "date"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c0a23ab1-e3b7-4301-85e7-cd25617123e1",
+      "name": "On form submission",
+      "webhookId": "39535f02-0c89-4068-b688-8ce8bc7d39ed"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "01f80e95-97a1-4678-830c-652cb90f0de0",
+              "leftValue": "={{ $json['Preferred Installation Date'].toDateTime() }}",
+              "rightValue": "={{ $now.plus(7,'days') }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "beforeOrEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "a03dd0a1-229b-4a07-89a2-dcc0face9220",
+      "name": "If within 7 days"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        400,
+        160
+      ],
+      "id": "4a4fb425-8b1b-4fe0-8914-c67d97501023",
+      "name": "To do"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "=Here's the installation date:  {{ $json['Preferred Installation Date'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        416,
+        -96
+      ],
+      "id": "74538e20-7eb1-4ebd-814a-0b27cdc0e819",
+      "name": "Discord",
+      "webhookId": "c12fd16d-24d3-4b1d-b2b7-b3e74944a561",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "xN3V7vKH2sIg3FbA",
+          "name": "Discord Webhook account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Email Address": "kamal.saifkamal534@gmail.com",
+          "Preferred Installation Date": "2025-07-25",
+          "submittedAt": "2025-07-25T02:40:43.212-07:00",
+          "formMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "If within 7 days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If within 7 days": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "To do",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d62fb53e-f70d-47e4-839f-c7492d62765b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b3c16ec41e85b3584be131b5515c638ca3963efad6f1c753d483ef391689444"
+  },
+  "id": "OXYsgFSKmWcsZqDV",
+  "tags": []
+}

@@ -1,0 +1,476 @@
+{
+  "name": "Send Client Info Conditionally",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Client Contact Form",
+        "formDescription": "Contains Client Name, Email & Short Description",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "name",
+              "placeholder": "Enter Your Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "email",
+              "fieldType": "email",
+              "placeholder": "Enter Your Email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "description",
+              "fieldType": "textarea",
+              "placeholder": "Say something about yourself",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Where do you want to send the contact form info?",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Google Sheets -> Discord"
+                  },
+                  {
+                    "option": "Gmail -> Discord"
+                  },
+                  {
+                    "option": "Google Sheets -> Telegram"
+                  },
+                  {
+                    "option": "Gmail -> Telegram"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -304,
+        -48
+      ],
+      "id": "e2752476-9782-47a7-8266-09ccd3241897",
+      "name": "On form submission",
+      "webhookId": "472677f5-f6e3-4c6b-9166-788b95b99cc1"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "17YFcWIFjaIdstX6W9ww9qgCdBrfD13O_TuZnlt8zdiU",
+          "mode": "list",
+          "cachedResultName": "Client Contact Form n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17YFcWIFjaIdstX6W9ww9qgCdBrfD13O_TuZnlt8zdiU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17YFcWIFjaIdstX6W9ww9qgCdBrfD13O_TuZnlt8zdiU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.name }}",
+            "Email": "={{ $json.email }}",
+            "Description": "={{ $json.description }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        208,
+        -144
+      ],
+      "id": "7ecbd26a-0495-4471-b1d4-d1a04a792e12",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "dQ3RG5WZ3j6mL8SV",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "Google Sheets -> Discord",
+                    "rightValue": "={{ $('On form submission').item.json['Where do you want to send the contact form info?'] }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "70f59380-fef5-4587-85db-6ec3a32e4d1b"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a51fe915-52ec-4393-af65-510624dbf2fc",
+                    "leftValue": "Google Sheets -> Telegram",
+                    "rightValue": "={{ $('On form submission').item.json['Where do you want to send the contact form info?'] }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        416,
+        -160
+      ],
+      "id": "9c6e93db-8b7a-4436-9689-bdf8091a2cda",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "chatId": "1206601744",
+        "text": "=Here's the client details:\n\nName: {{ $json.Name }}\nEmail: {{ $json.Email }}\nDescription:{{ $json.Description }} ",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        688,
+        64
+      ],
+      "id": "7160ace1-1c4a-4241-87e6-b4a5918d81f7",
+      "name": "Send a text message",
+      "webhookId": "acd526ca-7eeb-48c3-ac8d-175c4270f1e5",
+      "credentials": {
+        "telegramApi": {
+          "id": "JLIQfTpL4mcJ2SyQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "Google Sheets -> Discord",
+                    "rightValue": "={{ $json['Where do you want to send the contact form info?'] }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "47bc300d-e3ea-4c7a-9418-f095bf109c9f"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "bb3f2e63-d6ab-4191-b73f-f0bc20f50211",
+                    "leftValue": "Gmail -> Discord",
+                    "rightValue": "={{ $json['Where do you want to send the contact form info?'] }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "aa62820a-1917-41b4-a07b-735736df773e",
+                    "leftValue": "Google Sheets -> Telegram",
+                    "rightValue": "={{ $json['Where do you want to send the contact form info?'] }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "08f24abf-feea-4961-b9f1-8c78bae59812",
+                    "leftValue": "Gmail -> Telegram",
+                    "rightValue": "={{ $json['Where do you want to send the contact form info?'] }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -48,
+        16
+      ],
+      "id": "1fdf3bd9-818f-4a3a-9079-5403f6da22d1",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "=Here's the client details:\n\nName: {{ $json.Name }}\nEmail: {{ $json.Email }}\nDescription: {{ $json.Description }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        640,
+        -416
+      ],
+      "id": "f3057566-2030-433b-8d7e-5fd7033bee55",
+      "name": "Discord",
+      "webhookId": "07a984d7-1276-4584-bab7-0ebd3827e77a",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "xN3V7vKH2sIg3FbA",
+          "name": "Discord Webhook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.sessionId }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        176
+      ],
+      "id": "e914373f-d643-45d7-b8ee-5e443dd03e28",
+      "name": "Get a message",
+      "webhookId": "df38e72a-2372-4ce8-ab61-8f672bd93298",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gGvbjov1MQr2eh7P",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Discord": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cfd336b7-2b47-4eb6-b8a9-048b00b9fe94",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b3c16ec41e85b3584be131b5515c638ca3963efad6f1c753d483ef391689444"
+  },
+  "id": "aKREIfgYXRAgLksa",
+  "tags": []
+}
