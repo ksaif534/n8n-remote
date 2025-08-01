@@ -72,6 +72,17 @@ A workflow that fetches data from an external API and stores it in a Notion data
 - Automatic Notion database page creation
 - Structured data storage in Notion
 
+### Restaurant Inventory System
+
+An AI-powered restaurant inventory management system that uses conversational interface to track and update ingredient stock levels.
+
+**Features:**
+- Conversational AI interface using Google Gemini
+- Airtable integration for inventory database
+- Real-time inventory search and updates
+- Memory buffer for contextual conversation
+- Webhook-based chat trigger for easy access
+
 ## Getting Started
 
 ### Prerequisites
